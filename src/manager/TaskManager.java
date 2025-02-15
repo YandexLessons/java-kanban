@@ -1,110 +1,75 @@
 package manager;
 
-
 import model.Epic;
 import model.SubTask;
 import model.Task;
-import model.TaskStatus;
-
-import java.util.ArrayList;
-import java.util.HashMap;
 import java.util.List;
-import java.util.Map;
 
-public class TaskManager {
-    private Map<Integer, Task> tasks = new HashMap<>();
-    private Map<Integer, SubTask> subtasks = new HashMap<>();
-    private Map<Integer, Epic> epics = new HashMap<>();
-    private int idCounter = 1;
+/**
+ * Интерфейс TaskManager описывает базовые операции для управления задачами.
+ * Он включает методы для работы с простыми задачами, эпиками и подзадачами,
+ * а также метод для получения истории просмотров задач.
+ */
+public interface TaskManager {
 
-    public int generateId() {
-        return idCounter++;
-    }
 
-    public void addTask(Task task) {
-        tasks.put(task.getId(), task);
-    }
+    // Добавляет простую задачу в систему.
+    void addTask(Task task);
 
-    public void addSubtask(SubTask subtask) {
-        subtasks.put(subtask.getId(), subtask);
-        Epic epic = epics.get(subtask.getEpicId());
-        if (epic != null) {
-            epic.addSubtask(subtask.getId());
-            updateEpicStatus(epic.getId());
-        }
-    }
+    /**
+     * Добавляет подзадачу в систему.
+     * При этом подзадача связывается с определённым эпиком.
+     */
+    void addSubtask(SubTask subtask);
 
-    public void addEpic(Epic epic) {
-        epics.put(epic.getId(), epic);
-    }
+    /**
+     * Добавляет эпик в систему.
+     * Эпик может содержать список связанных подзадач.
+     */
+    void addEpic(Epic epic);
 
-    public void updateEpicStatus(int epicId) {
-        Epic epic = epics.get(epicId);
-        if (epic == null) return;
+    // Удаляет простую задачу по её идентификатору.
+    void removeTask(int id);
 
-        List<Integer> subtaskIds = epic.getSubtaskIds();
-        if (subtaskIds.isEmpty()) {
-            epic.setStatus(TaskStatus.NEW);
-            return;
-        }
 
-        boolean allDone = true;
-        boolean anyInProgress = false;
+    // Удаляет подзадачу по её идентификатору.
+    void removeSubtask(int id);
 
-        for (int subtaskId : subtaskIds) {
-            SubTask subtask = subtasks.get(subtaskId);
-            if (subtask != null) {
-                if (subtask.getStatus() != TaskStatus.DONE) {
-                    allDone = false;
-                }
-                if (subtask.getStatus() == TaskStatus.IN_PROGRESS) {
-                    anyInProgress = true;
-                }
-            }
-        }
+    /**
+     * Удаляет эпик по его идентификатору.
+     * При этом могут быть удалены также все подзадачи, связанные с данным эпиком.
+     */
+    void removeEpic(int id);
 
-        if (allDone) {
-            epic.setStatus(TaskStatus.DONE);
-        } else if (anyInProgress) {
-            epic.setStatus(TaskStatus.IN_PROGRESS);
-        } else {
-            epic.setStatus(TaskStatus.NEW);
-        }
-    }
+    /**
+     * Удаляет все простые задачи из системы.
+     */
+    void removeAllTasks();
 
-    public void removeTask(int id) {
-        tasks.remove(id);
-    }
+    /**
+     * Удаляет все подзадачи из системы.
+     */
+    void removeAllSubtasks();
 
-    public void removeSubtask(int id) {
-        SubTask subtask = subtasks.remove(id);
-        if (subtask != null) {
-            Epic epic = epics.get(subtask.getEpicId());
-            if (epic != null) {
-                epic.removeSubtask(id);
-                updateEpicStatus(epic.getId());
-            }
-        }
-    }
+    /**
+     * Удаляет все эпики из системы.
+     */
+    void removeAllEpics();
 
-    public void removeEpic(int id) {
-        Epic epic = epics.remove(id);
-        if (epic != null) {
-            for (int subtaskId : epic.getSubtaskIds()) {
-                subtasks.remove(subtaskId);
-            }
-        }
-    }
+    /**
+     * Возвращает список всех простых задач, хранящихся в системе.
+     */
+    List<Task> getAllTasks();
 
-    public List<Task> getAllTasks() {
-        return new ArrayList<>(tasks.values());
-    }
+    /**
+     * Возвращает список всех подзадач, хранящихся в системе.
+     */
+    List<SubTask> getAllSubtasks();
 
-    public List<SubTask> getAllSubtasks() {
-        return new ArrayList<>(subtasks.values());
-    }
+    /**
+     * Возвращает список всех эпиков, хранящихся в системе.
+     */
+    List<Epic> getAllEpics();
 
-    public List<Epic> getAllEpics() {
-        return new ArrayList<>(epics.values());
-    }
+    List<Task> getHistory();
 }
