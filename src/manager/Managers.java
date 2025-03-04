@@ -1,5 +1,7 @@
 package manager;
 
+import java.io.File;
+
 /**
  * Утилитарный класс для создания экземпляров менеджеров.
  */
@@ -9,7 +11,7 @@ public class Managers {
      * Возвращает новый экземпляр TaskManager.
      */
     public static TaskManager getDefault() {
-        return new InMemoryTaskManager();
+        return new FileBackedTaskManager(new File("tasks.csv"));
     }
 
     /**

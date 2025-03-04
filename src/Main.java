@@ -9,6 +9,11 @@ public class Main {
     public static void main(String[] args) {
         TaskManager manager = Managers.getDefault();
 
+        // Проверка загрузки данных из файла
+        System.out.println("Loaded tasks: " + manager.getAllTasks());
+        System.out.println("Loaded epics: " + manager.getAllEpics());
+        System.out.println("Loaded subtasks: " + manager.getAllSubtasks());
+
         // Создание задач
         Task task1 = new Task("Task1", "Desc1");
         Task task2 = new Task("Task2", "Desc2");
